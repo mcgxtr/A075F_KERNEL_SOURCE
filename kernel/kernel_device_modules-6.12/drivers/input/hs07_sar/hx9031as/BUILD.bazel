@@ -1,0 +1,38 @@
+load("//build/bazel_mgk_rules:mgk_ddk_ko.bzl", "define_mgk_ddk_ko")
+load("@mgk_info//:kernel_version.bzl","kernel_version",)
+
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+filegroup(
+    name = "ddk_kconfigs",
+    srcs = glob([
+        "**/Kconfig",
+    ]),
+)
+
+define_mgk_ddk_ko(
+    name = "hx9031as_hs07",
+    srcs = [
+        "hx9031as.c",
+        "hx9031as.h",
+        "tyhx_log.h",
+    ],
+    hdrs = glob([
+        "sensors_core.h",
+    ]),
+    includes = ["."],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/input/hs07_sar:sensor_user_node_hs07".format(kernel_version),
+        "//kernel_device_modules-{}/drivers/input/hs07_sar:sensor_fac_node_hs07".format(kernel_version),
+        "//kernel_device_modules-{}/drivers/input/hs07_sar:sensors_core_hs07".format(kernel_version),
+        "//kernel_device_modules-{}/drivers/misc/mediatek/board_id:board_id_status".format(kernel_version),
+    ],
+    header_deps = [
+        "//kernel_device_modules-{}/drivers/input/hs07_sar:sensor_common_header".format(kernel_version),
+    ],
+)
+

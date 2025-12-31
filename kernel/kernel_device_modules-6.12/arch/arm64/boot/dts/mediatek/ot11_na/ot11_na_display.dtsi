@@ -1,0 +1,88 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+/*
+ * Copyright (C) 2020 MediaTek Inc.
+ */
+
+/* display start */
+&mtk_leds {
+	compatible = "mediatek,disp-leds";
+
+	backlight {
+		/*Tab A9 code for AX6739W-45 by jiangyue at 20250616 start*/
+		force-dts = <1>;
+		led-mode = <4>;
+		/*Tab A9 code for AX6739W-45 by jiangyue at 20250616 end*/
+		gate_enable = <0>;
+		/*Tab A9 code for AX6739W-45 by jiangyue at 20250620 start*/
+                /*Tab A9_BOS code for AX6739W-45 by caiyang at 20250819 start*/
+		max-brightness = <255>;
+                /*Tab A9_BOS code for AX6739W-45 by caiyang at 20250819 end*/
+		max-hw-brightness = <4095>;
+		/*Tab A9 code for AX6739W-45 by jiangyue at 20250620 end*/
+		pwm_config = <0 1 0 0 0>;
+	};
+};
+
+&pio {
+	ctp_rst_pin_low: ctp_rst_pin_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO155__FUNC_GPIO155>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+	ctp_rst_pin_high: ctp_rst_pin_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO155__FUNC_GPIO155>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+};
+
+&dsi0 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	panel1@0 {
+		compatible = "panel,lcm,video";
+		reg = <0>;
+		reset-gpios = <&pio 85 0>;//lcm rst
+		bias-gpios = <&pio 156 0>, <&pio 157 0>;//vsp.vsn
+		pinctrl-names = "ctp_rst_pin_low","ctp_rst_pin_high";
+		pinctrl-0 = <&ctp_rst_pin_low>;
+		pinctrl-1 = <&ctp_rst_pin_high>;
+		port {
+			panel_in1: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
+		};
+	};
+
+	ports {
+		port {
+			dsi_out: endpoint {
+				remote-endpoint = <&panel_in1>;
+			};
+		};
+	};
+};
+
+&i2c5 {
+	i2c_lcd_bias_mtk:i2c_lcd_bias@3e {
+		compatible = "mediatek,i2c_lcd_bias";
+		reg = <0x3e>;
+		id = <5>;
+		status = "okay";
+	};
+};
+
+&i2c6 {
+	i2c_lcd_bias_mtk_official:i2c_lcd_bias@3e {
+		compatible = "mediatek,i2c_lcd_bias";
+		reg = <0x3e>;
+		id = <5>;
+		status = "okay";
+	};
+};
+

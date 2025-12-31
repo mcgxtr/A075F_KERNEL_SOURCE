@@ -1,0 +1,9 @@
+obj-$(CONFIG_DRM_LCD_HX83102E_XX_INX_VIDEO) += lcd_hx83102e_xx_inx_video.o
+obj-$(CONFIG_DRM_LCD_NL9951_GX_BOE_VIDEO) += lcd_nl9951_gx_boe_video.o
+obj-$(CONFIG_DRM_LCD_HX83102E_LC_HKC_VIDEO) += lcd_hx83102e_lc_hkc_video.o
+obj-$(CONFIG_DRM_LCD_JD9366TC_XX_HKC_VIDEO) += lcd_jd9366tc_xx_hkc_video.o
+obj-$(CONFIG_DRM_LCD_NT36523D_LC_HSD_VIDEO) += lcd_nt36523d_lc_hsd_video.o
+obj-$(CONFIG_DRM_LCD_HX83102E_CD_INX_VIDEO) += lcd_hx83102e_cd_inx_video.o
+obj-$(CONFIG_DRM_LCD_HX83102E_GX_HSD_INCELL_VIDEO) += lcd_hx83102e_gx_hsd_incell_video.o
+obj-$(CONFIG_DRM_LCD_HX83102E_CD_INX_NEW_VIDEO) += lcd_hx83102e_cd_inx_new_video.o
+obj-$(CONFIG_DRM_LCD_DEFAULT_MIPI_FHD_VIDEO) += lcd_default_mipi_fhd_video.o

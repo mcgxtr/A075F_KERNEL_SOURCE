@@ -1,0 +1,51 @@
+load("//build/bazel_mgk_rules:mgk_ddk_ko.bzl", "define_mgk_ddk_ko")
+load("@mgk_info//:kernel_version.bzl", "kernel_version")
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+filegroup(
+    name = "ddk_kconfigs",
+    srcs = glob([
+        "**/Kconfig",
+    ]),
+)
+filegroup(
+    name = "ddk_makefile",
+    srcs = glob([
+        "**/Makefile",
+        "**/Kbuild",
+        "**/*.c",
+        "**/*.h",
+    ]),
+)
+PANELS = [
+    "lcd_hx83108d_xx_hkc_mipi_hd_video",
+    "lcd_nl9916x_txd_boe_mipi_hd_video",
+    "lcd_nl9916x_ld_hkc_mipi_hd_video",
+    "lcd_gc7272_xx_hsd_mipi_hd_video",
+    "lcd_nl9916x_xx_tm_mipi_hd_video",
+    "lcd_nl9916x_txd_csot_mipi_hd_video",
+    "lcd_nl9916x_txd_boe_hh_mipi_hd_video",
+    "lcd_nl9916x_txd_boe_htr_mipi_hd_video",
+    "lcd_gc7272_xx_boe_mipi_hd_video",
+    "lcd_default_mipi_hd_video",
+]
+[define_mgk_ddk_ko(
+    name = "{}".format(p),
+    srcs = [
+        "{}.c".format(p),
+    ],
+    header_deps = [
+        "//kernel_device_modules-{}/drivers/gpu/drm/mediatek/mediatek_v2:ddk_public_headers".format(kernel_version),
+    ],
+    hdrs = glob([
+        "**/*.h".format(p),
+    ]),
+    includes = ["."],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/gpu/drm/mediatek/mediatek_v2:mtk_panel_ext".format(kernel_version),
+	"//kernel_device_modules-{}/drivers/gpu/drm/panel:panel-bias-hs07".format(kernel_version),
+    ],
+) for p in PANELS]

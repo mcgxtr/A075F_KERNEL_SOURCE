@@ -1,0 +1,89 @@
+load("//build/bazel_mgk_rules:mgk_ddk_ko.bzl", "define_mgk_ddk_ko")
+load("@mgk_info//:kernel_version.bzl", "kernel_version",)
+load("//build/kernel/kleaf:kernel.bzl", "ddk_headers")
+
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+# A07 code for AL7761C-1 by xiaojian at 20250729 start
+filegroup(
+    name = "ddk_kconfigs",
+    srcs = glob([
+        "**/Kconfig",
+    ]),
+)
+# A07 code for AL7761C-1 by xiaojian at 20250729 end
+
+define_mgk_ddk_ko(
+    name = "pd_policy_manager",
+    srcs = [
+        "pd_policy_manager.c",
+    ],
+    includes = ["."],
+    hdrs = ["pd_policy_manager.h",],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/misc/mediatek/typec/tcpc:tcpc_class".format(kernel_version),
+    ],
+)
+
+define_mgk_ddk_ko(
+    name = "nx853x_charger",
+    srcs = [
+        "nx853x_charger.c",
+    ],
+    includes = ["."],
+    hdrs = ["nx853x_reg.h",
+    "pd_policy_manager.h",
+    ],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/power/supply:gxy_psy_sysfs".format(kernel_version),
+        ":pd_policy_manager".format(kernel_version),
+    ],
+)
+
+define_mgk_ddk_ko(
+    name = "sp2131_charger",
+    srcs = [
+        "sp2131_charger.c",
+    ],
+    includes = ["."],
+    hdrs = ["sp2131_charger.h",
+    "pd_policy_manager.h",
+    "sp2131_reg.h",
+    ],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/power/supply:gxy_psy_sysfs".format(kernel_version),
+        ":pd_policy_manager".format(kernel_version),
+    ],
+)
+
+define_mgk_ddk_ko(
+    name = "sgm41608_charger",
+    srcs = [
+        "sgm41608_charger.c",
+    ],
+    includes = ["."],
+    hdrs = ["pd_policy_manager.h",],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/power/supply:gxy_psy_sysfs".format(kernel_version),
+        ":pd_policy_manager".format(kernel_version),
+    ],
+)
+
+define_mgk_ddk_ko(
+    name = "upm6726_charger",
+    srcs = [
+        "upm6726_charger.c",
+    ],
+    includes = ["."],
+    hdrs = ["upm6726_reg.h",
+    "pd_policy_manager.h",
+    ],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/power/supply:gxy_psy_sysfs".format(kernel_version),
+        ":pd_policy_manager".format(kernel_version),
+    ],
+)

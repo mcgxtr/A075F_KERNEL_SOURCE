@@ -1,0 +1,44 @@
+load("//build/bazel_mgk_rules:mgk_ddk_ko.bzl", "define_mgk_ddk_ko")
+load("@mgk_info//:kernel_version.bzl", "kernel_version")
+
+package(default_visibility = ["//visibility:public"])
+
+# Tab A11 code for AX7800W-11 by xiaozhenting at 20250820 start
+filegroup(
+    name = "ddk_kconfigs",
+    srcs = glob([
+        "**/Kconfig",
+    ]),
+)
+# Tab A11 code for AX7800W-11 by xiaozhenting at 20250820 end
+
+define_mgk_ddk_ko(
+    name = "sec-auth-sle956681",  
+    srcs = [
+        "sec_auth_sle956681.c",
+        "libs/authon-sdk/platform/helper.c",
+        "libs/authon-sdk/platform/bitbang.c",
+        "libs/authon-sdk/ecc/ecc.c",
+        "libs/authon-sdk/host_auth/host_auth.c",
+        "libs/authon-sdk/interface/interface.c",
+        "libs/authon-sdk/interface/swi_crc/swi_crc.c",
+        "libs/authon-sdk/interface/swi_crc_bus_command.c",
+        "libs/authon-sdk/nvm/nvm.c",
+        "libs/authon-sdk/authon_api.c",
+    ],
+    hdrs = glob([
+        "*.h",
+        "libs/*.h",
+        "libs/*/*.h",
+        "libs/*/*/*.h",
+        "libs/*/*/*/*.h",
+    ]),
+    includes = [".",],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/misc/mediatek/board_id:board_id_status".format(kernel_version),
+    ],
+    copts = [
+        "-Wall",
+        "-Werror",
+    ],
+)

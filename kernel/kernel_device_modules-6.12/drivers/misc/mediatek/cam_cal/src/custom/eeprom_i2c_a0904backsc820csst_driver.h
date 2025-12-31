@@ -1,0 +1,25 @@
+/*
+ * Copyright (C) 2018 MediaTek Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See http://www.gnu.org/licenses/gpl-2.0.html for more details.
+ */
+/* Tab A9 code for AX6739W-29 by zhouying at 20240612 start */
+#ifndef __EEPROM_I2C_A0904BACKSC820CSST_DRIVER_H
+#define __EEPROM_I2C_A0904BACKSC820CSST_DRIVER_H
+#include <linux/i2c.h>
+#include "eeprom_i2c_custom_driver.h"
+
+unsigned int a0904backsc820csst_read_region(struct i2c_client *client,
+				unsigned int addr,
+				unsigned char *data,
+				unsigned int size);
+
+#endif				/* __CAM_CAL_LIST_H */
+/* Tab A9 code for AX6739W-29 by zhouying at 20240612 end */

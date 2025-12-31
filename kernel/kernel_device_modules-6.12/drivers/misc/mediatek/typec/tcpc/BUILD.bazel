@@ -1,0 +1,256 @@
+load("//build/bazel_mgk_rules:mgk_ddk_ko.bzl", "define_mgk_ddk_ko")
+# A07 LTE_BOS code for AL7761C-1 by xiaojian at 20250818 start
+load("//build/kernel/kleaf:kernel.bzl", "ddk_headers")
+# A07 LTE_BOS code for AL7761C-1 by xiaojian at 20250818 end
+load("@mgk_info//:kernel_version.bzl", "kernel_version",)
+
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+filegroup(
+    name = "ddk_kconfigs",
+    srcs = glob([
+        "**/Kconfig",
+    ]),
+)
+
+filegroup(
+    name = "ddk_src",
+    srcs = glob([
+        "**/Makefile",
+        "**/Kbuild",
+        "**/*.c",
+        "**/*.h",
+        "inc/*.h",
+    ]),
+)
+
+# A07 LTE_BOS code for AL7761C-1 by xiaojian at 20250818 start
+# typec public header
+ddk_headers(
+	name = "ddk_headers",
+	hdrs = glob([
+		"inc/*.h",
+	]),
+)
+# A07 LTE_BOS code for AL7761C-1 by xiaojian at 20250818 end
+
+CHIP_NAME = [
+    "mt6360",
+    "mt6370",
+    "mt6375",
+    "mt6379",
+    "rt1711h",
+    "cps8851",
+    "upm6922p",
+    "scv89601p_pd",
+    "rt1718s",
+    "et7304",
+]
+
+define_mgk_ddk_ko(
+    name = "pd_dbg_info",
+    srcs = [
+        "pd_dbg_info.c",
+    ],
+    includes = ["inc", "."],
+    hdrs = glob(["inc/*.h", "pd_dpm_prv.h"]),
+
+    copts = [
+        "-Wall",
+        "-Werror",
+        "-DCONFIG_RT_REGMAP",
+        "-I$(DEVICE_MODULES_PATH)/drivers/power/supply/",
+        "-I$(DEVICE_MODULES_PATH)/drivers/mfd/",
+    ],
+)
+
+define_mgk_ddk_ko(
+    name = "tcpc_class",
+    srcs = [
+        "rt-regmap.c",
+        "tcpci.c",
+        "tcpci_alert.c",
+        "tcpci_core.c",
+        "tcpci_timer.c",
+        "tcpci_typec.c",
+        "tcpm.c",
+    ],
+    conditional_srcs = {
+        "CONFIG_USB_POWER_DELIVERY": {
+            True: [
+                "pd_core.c",
+                "pd_dpm_alt_mode_dp.c",
+                "pd_dpm_core.c",
+                "pd_dpm_pdo_select.c",
+                "pd_dpm_reaction.c",
+                "pd_policy_engine.c",
+                "pd_policy_engine_com.c",
+                "pd_policy_engine_dbg.c",
+                "pd_policy_engine_dfp.c",
+                "pd_policy_engine_dr.c",
+                "pd_policy_engine_drs.c",
+                "pd_policy_engine_prs.c",
+                "pd_policy_engine_snk.c",
+                "pd_policy_engine_src.c",
+                "pd_policy_engine_ufp.c",
+                "pd_policy_engine_vcs.c",
+                "pd_process_evt.c",
+                "pd_process_evt_com.c",
+                "pd_process_evt_dbg.c",
+                "pd_process_evt_drs.c",
+                "pd_process_evt_prs.c",
+                "pd_process_evt_snk.c",
+                "pd_process_evt_src.c",
+                "pd_process_evt_tcp.c",
+                "pd_process_evt_vcs.c",
+                "pd_process_evt_vdm.c",
+                "tcpci_event.c",
+            ],
+        },
+    },
+    includes = ["inc", "."],
+    hdrs = glob(["inc/*.h", "pd_dpm_prv.h", "tcpc_aw35615/*.h", "tcpc_aw35615/*/*.h"]),
+    ko_deps = [":pd_dbg_info",
+        "//kernel_device_modules-{}/drivers/power/supply:gxy_psy_sysfs".format(kernel_version),
+        ],
+    copts = [
+        "-Wall",
+        "-Werror",
+        "-DCONFIG_RT_REGMAP",
+        "-I$(DEVICE_MODULES_PATH)/drivers/power/supply/",
+        "-I$(DEVICE_MODULES_PATH)/drivers/mfd/",
+    ],
+)
+
+define_mgk_ddk_ko(
+    name = "tcpci_late_sync",
+    srcs = [
+        "tcpci_late_sync.c",
+    ],
+    includes = ["inc", "."],
+    hdrs = glob(["inc/*.h", "pd_dpm_prv.h"]),
+    ko_deps = [":tcpc_class"],
+    copts = [
+        "-Wall",
+        "-Werror",
+        "-DCONFIG_RT_REGMAP",
+        "-I$(DEVICE_MODULES_PATH)/drivers/power/supply/",
+        "-I$(DEVICE_MODULES_PATH)/drivers/mfd/",
+    ],
+)
+
+define_mgk_ddk_ko(
+    name = "rt_pd_manager",
+    srcs = [
+        "rt_pd_manager.c",
+    ],
+    includes = ["inc", "."],
+    hdrs = glob(["inc/*.h", "pd_dpm_prv.h"]),
+    ko_deps = [":tcpc_class"],
+    copts = [
+        "-Wall",
+        "-Werror",
+        "-DCONFIG_RT_REGMAP",
+        "-I$(DEVICE_MODULES_PATH)/drivers/power/supply/",
+        "-I$(DEVICE_MODULES_PATH)/drivers/mfd/",
+    ],
+)
+
+[define_mgk_ddk_ko(
+    name = "tcpc_{}".format(chip),
+    srcs = [
+        "tcpc_{}.c".format(chip),
+    ],
+    includes = ["inc", "."],
+    hdrs = glob(["inc/*.h", "*.h"]),
+    ko_deps = [
+        ":tcpc_class",
+        ":pd_dbg_info",
+        "//kernel_device_modules-{}/drivers/power/supply:gxy_psy_sysfs".format(kernel_version),
+        "//kernel_device_modules-{}/drivers/power/supply:charger_class".format(kernel_version),
+    ],
+    copts = [
+        "-Wall",
+        "-Werror",
+        "-DCONFIG_RT_REGMAP",
+        "-I$(DEVICE_MODULES_PATH)/drivers/power/supply/",
+        "-I$(DEVICE_MODULES_PATH)/drivers/mfd/",
+    ],
+) for chip in CHIP_NAME]
+
+define_mgk_ddk_ko(
+    name = "aw35615_whole",
+    srcs = [
+        "tcpc_aw35615/aw35615_driver.c",
+        "tcpc_aw35615/aw35615_global.c",
+        "tcpc_aw35615/platform_helpers.c",
+        "tcpc_aw35615/dfs.c",
+        "tcpc_aw35615/core.c",
+        "tcpc_aw35615/PDPolicy.c",
+        "tcpc_aw35615/timer.c",
+        "tcpc_aw35615/PDProtocol.c",
+        "tcpc_aw35615/TypeC.c",
+        "tcpc_aw35615/Port.c",
+        "tcpc_aw35615/vendor_info.c",
+        "tcpc_aw35615/modules/dpm.c",
+        "tcpc_aw35615/modules/observer.c",
+        "tcpc_aw35615/vdm/bitfield_translators.c",
+        "tcpc_aw35615/vdm/vdm.c",
+        "tcpc_aw35615/vdm/vdm_callbacks.c",
+        "tcpc_aw35615/vdm/DisplayPort/dp.c",
+        "tcpc_aw35615/PDPolicy.h",
+        "tcpc_aw35615/PDProtocol.h",
+        "tcpc_aw35615/PD_Types.h",
+        "tcpc_aw35615/Port.h",
+        "tcpc_aw35615/TypeC.h",
+        "tcpc_aw35615/TypeC_Types.h",
+        "tcpc_aw35615/aw35615_driver.h",
+        "tcpc_aw35615/aw35615_global.h",
+        "tcpc_aw35615/aw_types.h",
+        "tcpc_aw35615/core.h",
+        "tcpc_aw35615/dfs.h",
+        "tcpc_aw35615/modules/dpm.h",
+        "tcpc_aw35615/modules/observer.h",
+        "tcpc_aw35615/platform_helpers.h",
+        "tcpc_aw35615/sysfs_header.h",
+        "tcpc_aw35615/timer.h",
+        "tcpc_aw35615/vdm/DisplayPort/dp.h",
+        "tcpc_aw35615/vdm/DisplayPort/dp_types.h",
+        "tcpc_aw35615/vdm/bitfield_translators.h",
+        "tcpc_aw35615/vdm/fsc_vdm_defs.h",
+        "tcpc_aw35615/vdm/vdm.h",
+        "tcpc_aw35615/vdm/vdm_callbacks.h",
+        "tcpc_aw35615/vdm/vdm_callbacks_defs.h",
+        "tcpc_aw35615/vdm/vdm_types.h",
+        "tcpc_aw35615/vendor_info.h",
+        "tcpc_aw35615/vif_macros.h",
+    ],
+    includes = ["inc", ".", "tcpc_aw35615", "tcpc_aw35615/modules", "tcpc_aw35615/vdm", "tcpc_aw35615/vdm/DisplayPort"],
+    ko_deps = [
+        ":tcpc_class",
+        "//kernel_device_modules-{}/drivers/power/supply:gxy_psy_sysfs".format(kernel_version),
+        "//kernel_device_modules-{}/drivers/power/supply:upm6910x_charger".format(kernel_version),
+    ],
+    copts = [
+        "-Wall",
+        "-Werror",
+        "-DAW_HAVE_SNK",
+        "-DAW_HAVE_SRC",
+        "-DAW_HAVE_DRP",
+        "-DAW_HAVE_ACCMODE",
+        "-DAW_HAVE_EXT_MSG",
+        "-DAW_HAVE_VDM",
+        "-DAW_HAVE_DP",
+        "-DAW_HAVE_VBUS_ONLY",
+        "-I$(DEVICE_MODULES_PATH)/drivers/power/supply/",
+        "-I$(DEVICE_MODULES_PATH)/drivers/mfd/",
+        "-I$(DEVICE_MODULES_PATH)/drivers/misc/mediatek/typec/tcpc/tcpc_aw35615",
+        "-I$(DEVICE_MODULES_PATH)/drivers/misc/mediatek/typec/tcpc/tcpc_aw35615/modules",
+        "-I$(DEVICE_MODULES_PATH)/drivers/misc/mediatek/typec/tcpc/tcpc_aw35615/vdm",
+        "-I$(DEVICE_MODULES_PATH)/drivers/misc/mediatek/typec/tcpc/tcpc_aw35615/vdm/DisplayPort",
+    ],
+)

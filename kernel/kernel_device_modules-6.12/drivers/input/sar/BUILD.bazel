@@ -1,0 +1,62 @@
+load("//build/bazel_mgk_rules:mgk_ddk_ko.bzl", "define_mgk_ddk_ko")
+load("@mgk_info//:kernel_version.bzl","kernel_version",)
+
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+
+define_mgk_ddk_ko(
+    name = "sensor_fac_node",
+    srcs = [
+        "sensor_fac_node.c",
+        "sensor_fac_node.h",
+    ],
+    includes = ["."],
+)
+define_mgk_ddk_ko(
+    name = "sensor_user_node",
+    srcs = [
+        "sensor_user_node.c",
+        "sensor_user_node.h",
+    ],
+    includes = ["."],
+)
+define_mgk_ddk_ko(
+    name = "sensors_core",
+    srcs = [
+        "sensors_core.c",
+    ],
+    hdrs = glob([
+        "sensors_core.h",
+    ]),
+    includes = ["."],
+)
+define_mgk_ddk_ko(
+    name = "sx933x",
+    srcs = [
+        "sx933x.c",
+        "sx933x.h",
+        "sensor_user_node.h",
+        "sensor_fac_node.h",
+    ],
+    hdrs = glob([
+        "sensors_core.h",
+    ]),
+    includes = ["."],
+    ko_deps = [
+        "//kernel_device_modules-{}/drivers/input/sar:sensor_user_node".format(kernel_version),
+        "//kernel_device_modules-{}/drivers/input/sar:sensor_fac_node".format(kernel_version),
+        "//kernel_device_modules-{}/drivers/input/sar:sensors_core".format(kernel_version),
+        "//kernel_device_modules-{}/drivers/misc/mediatek/board_id:board_id_status".format(kernel_version),
+    ],
+)
+
+filegroup(
+    name = "ddk_kconfigs",
+    srcs = glob([
+        "**/Kconfig",
+    ]),
+)

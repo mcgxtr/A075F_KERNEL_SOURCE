@@ -1,0 +1,61 @@
+load("//build/bazel_mgk_rules:mgk_ddk_ko.bzl", "define_mgk_ddk_ko")
+load("@mgk_info//:kernel_version.bzl","kernel_version",)
+load("//build/kernel/kleaf:kernel.bzl", "ddk_headers")
+
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+filegroup(
+    name = "ddk_kconfigs",
+    srcs = glob([
+        "**/Kconfig",
+    ]),
+)
+filegroup(
+    name = "ddk_makefile",
+    srcs = glob([
+        "**/Makefile",
+        "**/Kbuild",
+        "**/*.c",
+        "**/*.h",
+    ]),
+)
+
+define_mgk_ddk_ko(
+    name = "sensor_fac_node_hs07",
+    srcs = [
+        "sensor_fac_node.c",
+        "sensor_fac_node.h",
+    ],
+    includes = ["."],
+)
+define_mgk_ddk_ko(
+    name = "sensor_user_node_hs07",
+    srcs = [
+        "sensor_user_node.c",
+        "sensor_user_node.h",
+    ],
+    includes = ["."],
+)
+define_mgk_ddk_ko(
+    name = "sensors_core_hs07",
+    srcs = [
+        "sensors_core.c",
+    ],
+    hdrs = glob([
+        "sensors_core.h",
+    ]),
+    includes = ["."],
+)
+
+ddk_headers(
+	name = "sensor_common_header",
+	hdrs = glob([
+		"**/*.h",
+	]),
+	includes = ["."],
+)
+

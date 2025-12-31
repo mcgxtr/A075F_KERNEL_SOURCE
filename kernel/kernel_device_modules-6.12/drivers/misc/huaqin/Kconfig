@@ -1,0 +1,26 @@
+#
+# for huaqin misc info
+#
+
+# Tab A9_BOS code for AX6739W-11 by Liushiyuan at 20250607 start
+config HQ_SIM_TRAY_CHECK
+	tristate "check sim stry status"
+        default y
+	help
+	  this will create a node to show sim tray status.
+
+	  If unsure, say N.
+# Tab A9_BOS code for AX6739W-11 by Liushiyuan at 20250607 end
+# Tab A9 code for SR-AX6739A-01-371 by tangyuhang at 20230526 start
+config TRIGGER_CRASH_BY_KEY
+  	tristate "Enable trigger crash by keys"
+	  help
+	    You can trigger crash by pressing keys in strict order:
+	    VOLUMEUP twice + VOLUMEDOWN twice + POWER twice.
+# Tab A9 code for SR-AX6739A-01-371 by tangyuhang at 20230526 end
+
+config HPERF_ENABLE
+    tristate "regulatore control of hperf"
+    help
+      Say m here if you have a hperf.
+      If unsure, say N.

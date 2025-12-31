@@ -1,0 +1,42 @@
+load("//build/bazel_mgk_rules:mgk_ddk_ko.bzl", "define_mgk_ddk_ko")
+load("@mgk_info//:kernel_version.bzl","kernel_version",)
+
+package(
+	default_visibility = [
+		"//visibility:public",
+	],
+)
+
+filegroup(
+	name = "srcs",
+	srcs = glob([
+		"**/Makefile",
+		"**/Kbuild",
+		"**/*.c",
+		"**/*.h",
+	]),
+)
+
+define_mgk_ddk_ko(
+	name = "jiiov_fp_hs07",
+	srcs = [
+		"jiiov_platform.c",
+		"jiiov_netlink.c",
+		"custom.c",
+	],
+	hdrs = glob(["**/*.h"]),
+	includes = ["include"],
+	copts = [
+		"-Wall",
+		"-Werror",
+		"-I$(DEVICE_MODULES_PATH)/drivers/misc/mediatek/include/",
+		"-I$(DEVICE_MODULES_PATH)/drivers/gpu/drm/mediatek/mediatek_v2/",
+	],
+	#A07 LTE_BOS code for AL7761C-1 by dingying at 20250804 start
+	ko_deps = [
+		"//kernel_device_modules-{}/drivers/spi:spi-mt65xx".format(kernel_version),
+		"//kernel_device_modules-{}/drivers/input/fingerprint/hs07:fingerprint_sysfs_hs07".format(kernel_version),
+		"//kernel_device_modules-{}/drivers/gpu/drm/mediatek/mediatek_v2:mtk_disp_notify".format(kernel_version),
+	],
+	#A07 LTE_BOS code for AL7761C-1 by dingying at 20250804 end
+)
